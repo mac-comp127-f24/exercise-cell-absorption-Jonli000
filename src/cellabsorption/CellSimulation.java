@@ -20,7 +20,6 @@ public class CellSimulation {
 
     public CellSimulation() {
         canvas = new CanvasWindow("Cell Absorption", 800, 800);
-        cells = new ArrayList<>();
         populateCells();
 
         //noinspection InfiniteLoopStatement
@@ -28,21 +27,25 @@ public class CellSimulation {
             Point canvasCenter = new Point(canvas.getWidth() / 2.0, canvas.getHeight() / 2.0);
             for (Cell cell : cells) {
                 cell.moveAround(canvasCenter);
-                cell.grow(0.02);
             }
+            handleCellInteraction();
             canvas.draw();
             canvas.pause(10);
         }
     }
 
     private void populateCells() {
-        double size = rand.nextInt(5) + 2;
-        Cell cell = createCell(
+        cells = new ArrayList<>();
+        for (int i = 0; i < 200; i++) {
+            double size = rand.nextInt(5) + 2;
+            Cell cell = createCell(
             rand.nextDouble() * (canvas.getWidth() - size),
             rand.nextDouble() * (canvas.getWidth() - size),
             size,
             Color.getHSBColor(rand.nextFloat(), rand.nextFloat() * 0.5f + 0.1f, 1));
         canvas.add(cell.getShape());
+        cells.add(cell);
+        }
     }
 
     private static double sqr(double x) {
@@ -51,5 +54,15 @@ public class CellSimulation {
 
     private Cell createCell(double x, double y, double radius, Color color){
         return new Cell(x, y, radius, color);
+    }
+    
+    private void handleCellInteraction() {
+        for (int i = 0; i < cells.size(); i++) {
+            Cell cell0 = cells.get(i);
+            for (int j = i + 1; j < cells.size(); j++) {
+                Cell cell1 = cells.get(j);
+                cell0.interactWith(cell1);
+            }
+        }
     }
 }
